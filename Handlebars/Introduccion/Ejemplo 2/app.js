@@ -3,14 +3,20 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var mysql = require('mysql');
+const { create } = require("express-handlebars");//importacion de handelbars
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
 
+const hbs = create({//recibe las configuraciones de express
+  extname: ".hbs",//facilita el uso de la extension, dandole notacion .hbs
+  partialsDir: ["views/componentes"],//componetes
+});
+
 // view engine setup
+app.engine(".hbs", hbs.engine);//define motor de plantilla
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
@@ -26,32 +32,6 @@ app.use('/users', usersRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
-});
-
-// app.js
-
-// Configuración de la base de datos
-var mysql = require('mysql');
-var connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '1234',
-  database: 'usuarios'
-});
-
-// Conexión a la base de datos
-connection.connect(function(err) {
-  if (err) {
-    console.error('Error al conectar a la base de datos: ' + err);
-    return;
-  }
-  console.log('Conexión exitosa a la base de datos');
-});
-
-// Pasamos la conexión a la plantilla
-app.use(function(req, res, next) {
-  req.db = connection;
-  next();
 });
 
 // error handler
